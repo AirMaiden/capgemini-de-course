@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Bokeh Plot</title>
+    <style>
+      html, body {
+        box-sizing: border-box;
+        display: flow-root;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+    </style>
+    <script type="text/javascript" src="https://cdn.bokeh.org/bokeh/release/bokeh-3.5.1.min.js"></script>
+    <script type="text/javascript">
+        Bokeh.set_log_level("info");
+    </script>
+  </head>
+  <body>
+    <div id="c340a397-61c5-41f9-a15c-0428035126a3" data-root-id="p4328" style="display: contents;"></div>
+  
+    <script type="application/json" id="b5a7fa15-af29-498a-a883-40586142b404">
+      {"cf081357-13ba-47ed-936a-2e6218c660ab":{"version":"3.5.1","title":"Bokeh Application","roots":[{"type":"object","name":"Figure","id":"p4328","attributes":{"height":400,"x_range":{"type":"object","name":"FactorRange","id":"p4338","attributes":{"factors":["1st","2nd","3rd"]}},"y_range":{"type":"object","name":"DataRange1d","id":"p4330"},"x_scale":{"type":"object","name":"CategoricalScale","id":"p4339"},"y_scale":{"type":"object","name":"LinearScale","id":"p4340"},"title":{"type":"object","name":"Title","id":"p4331","attributes":{"text":"Survival Rates by Class"}},"renderers":[{"type":"object","name":"GlyphRenderer","id":"p4358","attributes":{"data_source":{"type":"object","name":"ColumnDataSource","id":"p4325","attributes":{"selected":{"type":"object","name":"Selection","id":"p4326","attributes":{"indices":[],"line_indices":[]}},"selection_policy":{"type":"object","name":"UnionRenderers","id":"p4327"},"data":{"type":"map","entries":[["class_groups",["1st","2nd","3rd"]],["survival_rates",[62.96296296296296,47.28260869565217,24.236252545824847]]]}}},"view":{"type":"object","name":"CDSView","id":"p4359","attributes":{"filter":{"type":"object","name":"AllIndices","id":"p4360"}}},"glyph":{"type":"object","name":"VBar","id":"p4355","attributes":{"x":{"type":"field","field":"class_groups"},"width":{"type":"value","value":0.9},"top":{"type":"field","field":"survival_rates"},"line_color":{"type":"value","value":"white"},"fill_color":{"type":"field","field":"class_groups","transform":{"type":"object","name":"CategoricalColorMapper","id":"p4351","attributes":{"palette":["#66c2a5","#fc8d62","#8da0cb"],"factors":["1st","2nd","3rd"]}}}}},"nonselection_glyph":{"type":"object","name":"VBar","id":"p4356","attributes":{"x":{"type":"field","field":"class_groups"},"width":{"type":"value","value":0.9},"top":{"type":"field","field":"survival_rates"},"line_color":{"type":"value","value":"white"},"line_alpha":{"type":"value","value":0.1},"fill_color":{"type":"field","field":"class_groups","transform":{"id":"p4351"}},"fill_alpha":{"type":"value","value":0.1},"hatch_alpha":{"type":"value","value":0.1}}},"muted_glyph":{"type":"object","name":"VBar","id":"p4357","attributes":{"x":{"type":"field","field":"class_groups"},"width":{"type":"value","value":0.9},"top":{"type":"field","field":"survival_rates"},"line_color":{"type":"value","value":"white"},"line_alpha":{"type":"value","value":0.2},"fill_color":{"type":"field","field":"class_groups","transform":{"id":"p4351"}},"fill_alpha":{"type":"value","value":0.2},"hatch_alpha":{"type":"value","value":0.2}}}}}],"toolbar":{"type":"object","name":"Toolbar","id":"p4337","attributes":{"tools":[{"type":"object","name":"HoverTool","id":"p4363","attributes":{"renderers":"auto","tooltips":[["Class","@class_groups"],["Survival Rate","@survival_rates{0.2f}%"]]}}]}},"toolbar_location":null,"left":[{"type":"object","name":"LinearAxis","id":"p4346","attributes":{"ticker":{"type":"object","name":"BasicTicker","id":"p4347","attributes":{"mantissas":[1,2,5]}},"formatter":{"type":"object","name":"BasicTickFormatter","id":"p4348"},"axis_label":"Survival Rate (%)","major_label_policy":{"type":"object","name":"AllLabels","id":"p4349"}}}],"below":[{"type":"object","name":"CategoricalAxis","id":"p4341","attributes":{"ticker":{"type":"object","name":"CategoricalTicker","id":"p4342"},"formatter":{"type":"object","name":"CategoricalTickFormatter","id":"p4343"},"axis_label":"Class","major_label_policy":{"type":"object","name":"AllLabels","id":"p4344"}}}],"center":[{"type":"object","name":"Grid","id":"p4345","attributes":{"axis":{"id":"p4341"}}},{"type":"object","name":"Grid","id":"p4350","attributes":{"dimension":1,"axis":{"id":"p4346"}}},{"type":"object","name":"Legend","id":"p4361","attributes":{"items":[{"type":"object","name":"LegendItem","id":"p4362","attributes":{"label":{"type":"field","field":"class_groups"},"renderers":[{"id":"p4358"}]}}]}}]}}]}}
+    </script>
+    <script type="text/javascript">
+      (function() {
+        const fn = function() {
+          Bokeh.safely(function() {
+            (function(root) {
+              function embed_document(root) {
+              const docs_json = document.getElementById('b5a7fa15-af29-498a-a883-40586142b404').textContent;
+              const render_items = [{"docid":"cf081357-13ba-47ed-936a-2e6218c660ab","roots":{"p4328":"c340a397-61c5-41f9-a15c-0428035126a3"},"root_ids":["p4328"]}];
+              root.Bokeh.embed.embed_items(docs_json, render_items);
+              }
+              if (root.Bokeh !== undefined) {
+                embed_document(root);
+              } else {
+                let attempts = 0;
+                const timer = setInterval(function(root) {
+                  if (root.Bokeh !== undefined) {
+                    clearInterval(timer);
+                    embed_document(root);
+                  } else {
+                    attempts++;
+                    if (attempts > 100) {
+                      clearInterval(timer);
+                      console.log("Bokeh: ERROR: Unable to run BokehJS code because BokehJS library is missing");
+                    }
+                  }
+                }, 10, root)
+              }
+            })(window);
+          });
+        };
+        if (document.readyState != "loading") fn();
+        else document.addEventListener("DOMContentLoaded", fn);
+      })();
+    </script>
+  </body>
+</html>
