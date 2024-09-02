@@ -7,7 +7,7 @@ This Apache Airflow DAG (`nyc_airbnb_etl.py`) automates the process of extractin
 ## Directory Structure
 
 The directory structure for this project is as follows:
-
+```
 /airflow-docker/
 ├── raw/
 │   └── AB_NYC_2019.csv
@@ -18,7 +18,7 @@ The directory structure for this project is as follows:
 ├── logs/
 │   └── airflow_failures.log
 └── plugins/
-
+```
 - **`dags/`**: Contains the DAG script.
 - **`raw_data/`**: Contains the raw CSV file.
 - **`transformed_data/`**: Stores the transformed CSV file.
