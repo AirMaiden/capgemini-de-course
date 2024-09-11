@@ -78,22 +78,22 @@ log_file_path = "/path/to/your/log/etl_pipeline.log"
 
    1. Processed Files: After each batch, the processed CSV files are saved as partitioned Parquet files in the processed/ directory.
    2. SQL Queries:
-   •  Listings by Neighbourhood Group: Counts the number of listings per neighborhood group.
-   •  Top 10 Most Expensive Listings: Shows the top 10 listings by price.
-   •  Average Price by Room Type: Displays the average price per room type in each neighborhood group.
+   - Listings by Neighbourhood Group: Counts the number of listings per neighborhood group.
+   - Top 10 Most Expensive Listings: Shows the top 10 listings by price.
+   - Average Price by Room Type: Displays the average price per room type in each neighborhood group.
 These results are displayed in the console as the job runs.
    3. Logs:
-   •  Data Validation: After each batch, the row counts of the raw, transformed, and Parquet data are validated. Any NULL values in critical columns like price, minimum_nights, or availability_365 are logged.
-   •  Error Handling: If any step of the ETL process fails (reading, transforming, saving), the error details are logged for troubleshooting.
+   - Data Validation: After each batch, the row counts of the raw, transformed, and Parquet data are validated. Any NULL values in critical columns like price, minimum_nights, or availability_365 are logged.
+   - Error Handling: If any step of the ETL process fails (reading, transforming, saving), the error details are logged for troubleshooting.
    4. Processed Files Log: A log file (processed_files.log) tracks the files that have already been processed, preventing reprocessing in future runs.
 
 ## Error Handling
 
 If an error occurs during the ETL process (e.g., file reading, transformations, saving), the error will be logged to the etl_pipeline.log file. The script is designed to handle the following scenarios:
 
-   •  File Reading Issues: Errors during the file reading stage are logged and raised.
-   •  Transformation Failures: If there’s an error during transformation, it’s logged, and the process stops for the current batch.
-   •  Saving & Validation Failures: Errors during data saving or validation are logged.
+   - File Reading Issues: Errors during the file reading stage are logged and raised.
+   - Transformation Failures: If there’s an error during transformation, it’s logged, and the process stops for the current batch.
+   - Saving & Validation Failures: Errors during data saving or validation are logged.
 
 To troubleshoot, check the log file for detailed information.
 
@@ -103,6 +103,6 @@ The PySpark job runs continuously, monitoring for new files in the raw/ folder. 
 
 ## Notes
 
-   •  Streaming Configuration: The PySpark job uses structured streaming, processing new files as they appear in the raw/ folder.
-   •  File Tracking: The job keeps a log of processed files in the processed_files.log file to avoid duplication in future runs.
-   •  Performance: You can adjust the processingTime trigger (currently set to 10 seconds) depending on the size and frequency of incoming files.
+   - Streaming Configuration: The PySpark job uses structured streaming, processing new files as they appear in the raw/ folder.
+   - File Tracking: The job keeps a log of processed files in the processed_files.log file to avoid duplication in future runs.
+   - Performance: You can adjust the processingTime trigger (currently set to 10 seconds) depending on the size and frequency of incoming files.
