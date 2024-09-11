@@ -1,0 +1,12 @@
+2024-09-11 23:34:35 - INFO - File reading initiated successfully
+2024-09-11 23:34:35 - INFO - Callback Server Starting
+2024-09-11 23:34:35 - INFO - Socket listening on ('127.0.0.1', 50357)
+2024-09-11 23:34:37 - INFO - Python Server ready to receive messages
+2024-09-11 23:34:37 - INFO - Received command c on object id p0
+2024-09-11 23:34:44 - INFO - Processing new file: file:///Users/evgeniyakulish/DE_course/projects/capgemini-de-course/spark-tasks/raw/AB_NYC_2019.csv
+2024-09-11 23:34:44 - INFO - Transformation successful for current batch
+2024-09-11 23:34:48 - INFO - Data saved for batch 0
+2024-09-11 23:34:50 - INFO - Row count validation passed: Row count matches: 48718
+2024-09-11 23:34:50 - INFO - Null value check passed: no NULL values in critical columns (price, minimum_nights, availability_365).
+2024-09-11 23:34:51 - INFO - Parquet file stats: Row count = 48718, Average price = 152.7401781682335, Min price = 10, Max price = 10000
+2024-09-11 23:34:57 - INFO - SQL queries executed successfully
