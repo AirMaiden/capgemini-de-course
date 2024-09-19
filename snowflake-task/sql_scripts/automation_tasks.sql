@@ -2,7 +2,7 @@
 
 -- Create the task to automate transformation
 CREATE OR REPLACE TASK transform_airbnb_data_daily
-    WAREHOUSE = my_warehouse
+    WAREHOUSE = nyc_airbnb_wh
     SCHEDULE = 'USING CRON 0 0 * * * UTC' -- Daily at midnight
     COMMENT = 'Automated task to transform raw Airbnb data daily'
 AS
