@@ -12,7 +12,7 @@ This project builds a fully automated ETL pipeline using **Azure Blob Storage**,
 ## Project Structure
 
 ```plaintext
-azure-etl-project/
+azure-etl-tasks/
 │
 ├── README.md                                  # Project documentation
 │
