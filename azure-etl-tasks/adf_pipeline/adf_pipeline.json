@@ -1,0 +1,494 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "factoryName": {
+      "type": "string",
+      "metadata": "Data Factory name"
+    },
+    "AzureBlobStorage1": {
+      "type": "string"
+    },
+    "AzureSynapseAnalytics1": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+  },
+  "resources": [
+    {
+      "name": "[concat(parameters('factoryName'), '/ReadAndProcessDataset')]",
+      "type": "Microsoft.DataFactory/factories/pipelines",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "activities": [
+          {
+            "name": "Data flow1",
+            "type": "ExecuteDataFlow",
+            "dependsOn": [],
+            "policy": {
+              "timeout": "0.12:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "dataflow": {
+                "referenceName": "dataflow1",
+                "type": "DataFlowReference",
+                "parameters": {},
+                "datasetParameters": {
+                  "rawdata": {},
+                  "processeddata": {}
+                },
+                "linkedServiceParameters": {}
+              },
+              "staging": {},
+              "compute": {
+                "coreCount": 8,
+                "computeType": "General"
+              },
+              "traceLevel": "Fine"
+            }
+          },
+          {
+            "name": "loadToSynapse",
+            "type": "Copy",
+            "dependsOn": [
+              {
+                "activity": "Data flow1",
+                "dependencyConditions": [
+                  "Completed"
+                ]
+              }
+            ],
+            "policy": {
+              "timeout": "0.12:00:00",
+              "retry": 0,
+              "retryIntervalInSeconds": 30,
+              "secureOutput": false,
+              "secureInput": false
+            },
+            "userProperties": [],
+            "typeProperties": {
+              "source": {
+                "type": "DelimitedTextSource",
+                "storeSettings": {
+                  "type": "AzureBlobStorageReadSettings",
+                  "recursive": true,
+                  "enablePartitionDiscovery": false
+                },
+                "formatSettings": {
+                  "type": "DelimitedTextReadSettings"
+                }
+              },
+              "sink": {
+                "type": "SqlDWSink",
+                "allowCopyCommand": true,
+                "copyCommandSettings": {}
+              },
+              "enableStaging": false
+            },
+            "inputs": [
+              {
+                "referenceName": "ProcessedDataset",
+                "type": "DatasetReference",
+                "parameters": {}
+              }
+            ],
+            "outputs": [
+              {
+                "referenceName": "AzureSynapseAnalyticsTable1",
+                "type": "DatasetReference",
+                "parameters": {}
+              }
+            ]
+          }
+        ],
+        "policy": {
+          "elapsedTimeMetric": {}
+        },
+        "annotations": []
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/dataflows/dataflow1')]",
+        "[concat(variables('factoryId'), '/datasets/ProcessedDataset')]",
+        "[concat(variables('factoryId'), '/datasets/AzureSynapseAnalyticsTable1')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/dataflow1')]",
+      "type": "Microsoft.DataFactory/factories/dataflows",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "type": "MappingDataFlow",
+        "typeProperties": {
+          "sources": [
+            {
+              "dataset": {
+                "referenceName": "RawDataset",
+                "type": "DatasetReference"
+              },
+              "name": "rawdata"
+            }
+          ],
+          "sinks": [
+            {
+              "dataset": {
+                "referenceName": "ProcessedDataset",
+                "type": "DatasetReference"
+              },
+              "name": "processeddata"
+            }
+          ],
+          "transformations": [
+            {
+              "name": "positiveprice"
+            },
+            {
+              "name": "fillmissingvalues"
+            },
+            {
+              "name": "reviewspermonthfilled"
+            },
+            {
+              "name": "dropmissinglatitudelongitude"
+            }
+          ],
+          "scriptLines": [
+            "source(output(",
+            "          id as integer,",
+            "          name as string,",
+            "          host_id as integer,",
+            "          host_name as string,",
+            "          neighbourhood_group as string,",
+            "          neighbourhood as string,",
+            "          latitude as float,",
+            "          longitude as float,",
+            "          room_type as string,",
+            "          price as integer,",
+            "          minimum_nights as integer,",
+            "          number_of_reviews as integer,",
+            "          last_review as string,",
+            "          reviews_per_month as float,",
+            "          calculated_host_listings_count as integer,",
+            "          availability_365 as integer",
+            "     ),",
+            "     allowSchemaDrift: true,",
+            "     validateSchema: false,",
+            "     ignoreNoFilesFound: false) ~> rawdata",
+            "rawdata filter(price > 0) ~> positiveprice",
+            "positiveprice derive(last_review = iif(isNull(last_review), toDate('2000-01-01'), toDate(last_review, 'yyyy-MM-dd'))) ~> fillmissingvalues",
+            "fillmissingvalues derive(reviews_per_month = iif(isNull(reviews_per_month), toFloat(0), reviews_per_month)) ~> reviewspermonthfilled",
+            "reviewspermonthfilled filter(!isNull(latitude) && !isNull(longitude)) ~> dropmissinglatitudelongitude",
+            "dropmissinglatitudelongitude sink(allowSchemaDrift: true,",
+            "     validateSchema: false,",
+            "     input(",
+            "          id as string,",
+            "          name as string,",
+            "          host_id as string,",
+            "          host_name as string,",
+            "          neighbourhood_group as string,",
+            "          neighbourhood as string,",
+            "          latitude as string,",
+            "          longitude as string,",
+            "          room_type as string,",
+            "          price as string,",
+            "          minimum_nights as string,",
+            "          number_of_reviews as string,",
+            "          last_review as string,",
+            "          reviews_per_month as string,",
+            "          calculated_host_listings_count as string,",
+            "          availability_365 as string",
+            "     ),",
+            "     skipDuplicateMapInputs: true,",
+            "     skipDuplicateMapOutputs: true) ~> processeddata"
+          ]
+        }
+      },
+      "dependsOn": [
+        "[concat(variables('factoryId'), '/datasets/RawDataset')]",
+        "[concat(variables('factoryId'), '/datasets/ProcessedDataset')]"
+      ]
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/ProcessedDataset')]",
+      "type": "Microsoft.DataFactory/factories/datasets",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "linkedServiceName": {
+          "referenceName": "[parameters('AzureBlobStorage1')]",
+          "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "DelimitedText",
+        "typeProperties": {
+          "location": {
+            "type": "AzureBlobStorageLocation",
+            "fileName": "processed/processed-data.csv",
+            "container": "airbnb-data"
+          },
+          "columnDelimiter": ",",
+          "escapeChar": "\"",
+          "firstRowAsHeader": true,
+          "quoteChar": "\""
+        },
+        "schema": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "name",
+            "type": "String"
+          },
+          {
+            "name": "host_id",
+            "type": "String"
+          },
+          {
+            "name": "host_name",
+            "type": "String"
+          },
+          {
+            "name": "neighbourhood_group",
+            "type": "String"
+          },
+          {
+            "name": "neighbourhood",
+            "type": "String"
+          },
+          {
+            "name": "latitude",
+            "type": "String"
+          },
+          {
+            "name": "longitude",
+            "type": "String"
+          },
+          {
+            "name": "room_type",
+            "type": "String"
+          },
+          {
+            "name": "price",
+            "type": "String"
+          },
+          {
+            "name": "minimum_nights",
+            "type": "String"
+          },
+          {
+            "name": "number_of_reviews",
+            "type": "String"
+          },
+          {
+            "name": "last_review",
+            "type": "String"
+          },
+          {
+            "name": "reviews_per_month",
+            "type": "String"
+          },
+          {
+            "name": "calculated_host_listings_count",
+            "type": "String"
+          },
+          {
+            "name": "availability_365",
+            "type": "String"
+          }
+        ]
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable1')]",
+      "type": "Microsoft.DataFactory/factories/datasets",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "linkedServiceName": {
+          "referenceName": "[parameters('AzureSynapseAnalytics1')]",
+          "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "AzureSqlDWTable",
+        "schema": [
+          {
+            "name": "id",
+            "type": "int",
+            "precision": 10
+          },
+          {
+            "name": "name",
+            "type": "nvarchar"
+          },
+          {
+            "name": "host_id",
+            "type": "int",
+            "precision": 10
+          },
+          {
+            "name": "host_name",
+            "type": "nvarchar"
+          },
+          {
+            "name": "neighbourhood_group",
+            "type": "nvarchar"
+          },
+          {
+            "name": "neighbourhood",
+            "type": "nvarchar"
+          },
+          {
+            "name": "latitude",
+            "type": "float",
+            "precision": 15
+          },
+          {
+            "name": "longitude",
+            "type": "float",
+            "precision": 15
+          },
+          {
+            "name": "room_type",
+            "type": "nvarchar"
+          },
+          {
+            "name": "price",
+            "type": "float",
+            "precision": 15
+          },
+          {
+            "name": "minimum_nights",
+            "type": "int",
+            "precision": 10
+          },
+          {
+            "name": "number_of_reviews",
+            "type": "int",
+            "precision": 10
+          },
+          {
+            "name": "last_review",
+            "type": "date"
+          },
+          {
+            "name": "reviews_per_month",
+            "type": "float",
+            "precision": 15
+          },
+          {
+            "name": "calculated_host_listings_count",
+            "type": "int",
+            "precision": 10
+          },
+          {
+            "name": "availability_365",
+            "type": "int",
+            "precision": 10
+          }
+        ],
+        "typeProperties": {
+          "schema": "dbo",
+          "table": "ProcessedTable"
+        }
+      },
+      "dependsOn": []
+    },
+    {
+      "name": "[concat(parameters('factoryName'), '/RawDataset')]",
+      "type": "Microsoft.DataFactory/factories/datasets",
+      "apiVersion": "2018-06-01",
+      "properties": {
+        "linkedServiceName": {
+          "referenceName": "[parameters('AzureBlobStorage1')]",
+          "type": "LinkedServiceReference"
+        },
+        "annotations": [],
+        "type": "DelimitedText",
+        "typeProperties": {
+          "location": {
+            "type": "AzureBlobStorageLocation",
+            "fileName": "raw/sample_data_part1.csv",
+            "container": "airbnb-data"
+          },
+          "columnDelimiter": ",",
+          "escapeChar": "\\",
+          "firstRowAsHeader": true,
+          "quoteChar": "\""
+        },
+        "schema": [
+          {
+            "name": "id",
+            "type": "String"
+          },
+          {
+            "name": "name",
+            "type": "String"
+          },
+          {
+            "name": "host_id",
+            "type": "String"
+          },
+          {
+            "name": "host_name",
+            "type": "String"
+          },
+          {
+            "name": "neighbourhood_group",
+            "type": "String"
+          },
+          {
+            "name": "neighbourhood",
+            "type": "String"
+          },
+          {
+            "name": "latitude",
+            "type": "String"
+          },
+          {
+            "name": "longitude",
+            "type": "String"
+          },
+          {
+            "name": "room_type",
+            "type": "String"
+          },
+          {
+            "name": "price",
+            "type": "String"
+          },
+          {
+            "name": "minimum_nights",
+            "type": "String"
+          },
+          {
+            "name": "number_of_reviews",
+            "type": "String"
+          },
+          {
+            "name": "last_review",
+            "type": "String"
+          },
+          {
+            "name": "reviews_per_month",
+            "type": "String"
+          },
+          {
+            "name": "calculated_host_listings_count",
+            "type": "String"
+          },
+          {
+            "name": "availability_365",
+            "type": "String"
+          }
+        ]
+      },
+      "dependsOn": []
+    }
+  ]
+}
